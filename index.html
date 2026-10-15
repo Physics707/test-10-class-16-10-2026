@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050810">
+<title>Тест • Кинематика жидкости • 10 класс</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   КИНЕМАТИКА ЖИДКОСТИ • тест для 10 класса
+   Учитель физики: Кунгозин Даулет Багдашұлы
+   ============================================================ */
+:root{
+  --bg:#050810; --card:#0b1226; --card2:#0f1836;
+  --line:rgba(126,156,255,.16); --line2:rgba(126,156,255,.28);
+  --ink:#eaf0ff; --mut:#93a4d6; --dim:#5e6f9e;
+  --cyan:#3ee6ff; --mag:#ff3dcf; --lime:#53ff9d; --amber:#ffc247; --red:#ff4d6b;
+  --disp:'Unbounded',system-ui,sans-serif;
+  --body:'Rubik',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);
+  font:400 16px/1.55 var(--body);
+  background:
+    radial-gradient(900px 540px at 88% -12%, rgba(255,61,207,.10), transparent 62%),
+    radial-gradient(820px 520px at -12% 32%, rgba(62,230,255,.10), transparent 60%),
+    linear-gradient(180deg,#060a18,#04060f 55%,#070b1a);
+  background-attachment:fixed;
+  touch-action:manipulation;
+}
+#bgGrid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(99,130,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(99,130,255,.05) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 10%,#000 40%,transparent 100%);
+          mask-image:radial-gradient(120% 90% at 50% 10%,#000 40%,transparent 100%);
+}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.42;pointer-events:none;z-index:0}
+.orb.a{width:340px;height:340px;background:#0e6ba8;top:-120px;left:-90px;animation:drift 17s ease-in-out infinite alternate}
+.orb.b{width:300px;height:300px;background:#7a1668;bottom:-110px;right:-80px;animation:drift 21s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(46px,34px) scale(1.12)}}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;
+  padding:calc(20px + env(safe-area-inset-top)) 16px calc(44px + env(safe-area-inset-bottom))}
+
+.screen{display:none}
+.screen.on{display:block;animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.chip{display:inline-block;font:600 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);border:1px solid rgba(62,230,255,.35);padding:7px 12px;border-radius:999px;
+  background:rgba(62,230,255,.07);text-shadow:0 0 12px rgba(62,230,255,.55)}
+.chip.mg{color:var(--mag);border-color:rgba(255,61,207,.35);background:rgba(255,61,207,.07);text-shadow:0 0 12px rgba(255,61,207,.5)}
+.chip.am{color:var(--amber);border-color:rgba(255,194,71,.4);background:rgba(255,194,71,.07);text-shadow:0 0 12px rgba(255,194,71,.5)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+
+h1{font-family:var(--disp);font-weight:900;font-size:clamp(30px,7.4vw,52px);line-height:1.06;letter-spacing:.01em;margin:0 0 14px}
+h1 .neon{color:var(--cyan);text-shadow:0 0 18px rgba(62,230,255,.65),0 0 48px rgba(62,230,255,.3)}
+.lead{color:var(--mut);font-size:15px;max-width:56ch;margin:0 0 8px}
+
+.emblem{display:block;width:min(230px,58%);height:auto;margin:14px 0 4px}
+.emblem path,.mini path{fill:none;stroke-width:3.4;stroke-linecap:round;stroke-dasharray:12 16;animation:flow 2.8s linear infinite}
+.f1{stroke:var(--cyan)}.f2{stroke:var(--mag)}.f3{stroke:var(--amber);animation-delay:-.9s}.f4{stroke:#7aa2ff;animation-delay:-1.8s}
+@keyframes flow{to{stroke-dashoffset:-56}}
+
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+  border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);padding:22px}
+
+.teach{display:flex;align-items:center;gap:14px;border-left:3px solid var(--cyan);margin:22px 0 14px;padding:16px 18px}
+.ava{flex:0 0 52px;height:52px;border-radius:14px;display:grid;place-items:center;
+  font:700 18px var(--disp);color:#04121f;background:linear-gradient(135deg,#3ee6ff,#1f7bff);
+  box-shadow:0 0 18px rgba(62,230,255,.45)}
+.teach .lbl{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:3px}
+.teach b{font-size:16.5px}
+
+.form{margin-top:6px}
+.field{display:block;margin-bottom:14px}
+.lbl{display:block;font:600 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 7px}
+.field input,.field select{width:100%;background:#0a1124;border:1px solid var(--line2);border-radius:14px;
+  color:var(--ink);font:500 16px var(--body);padding:13px 15px;outline:none;transition:border-color .25s,box-shadow .25s;appearance:none;-webkit-appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233ee6ff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:42px}
+.field input:focus,.field select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(62,230,255,.14),0 0 20px rgba(62,230,255,.22)}
+.field input::placeholder{color:#43507c}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.att-info{min-height:20px;font:500 13px var(--mono);color:var(--amber);margin:2px 0 14px}
+
+.btn{display:block;width:100%;font:700 15px var(--body);letter-spacing:.02em;border-radius:14px;
+  padding:15px 22px;border:1px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .3s,background .3s,opacity .3s}
+.btn:active{transform:translateY(1px) scale(.995)}
+.btn-primary{background:linear-gradient(135deg,#2fd6ff,#1f7bff);color:#03121f;box-shadow:0 6px 24px rgba(47,180,255,.35)}
+.btn-primary:hover{box-shadow:0 8px 32px rgba(47,180,255,.5);transform:translateY(-1px)}
+.btn-primary:disabled{background:#16204a;color:#4a5a8c;box-shadow:none;cursor:not-allowed;transform:none}
+.btn-next{background:#101a3a;color:#4a5a8c;border-color:#1d2b57;cursor:not-allowed;margin-top:18px}
+.btn-next.armed{cursor:pointer;background:linear-gradient(135deg,#4dff9d,#19d37a);color:#032312;border-color:transparent;
+  box-shadow:0 0 22px rgba(83,255,157,.5),0 8px 26px rgba(25,211,122,.3);animation:armPulse 1.7s ease-in-out infinite}
+@keyframes armPulse{50%{box-shadow:0 0 36px rgba(83,255,157,.8),0 8px 30px rgba(25,211,122,.45)}}
+
+/* ---- Дисклеймер ---- */
+.disc h2{font:700 clamp(20px,5vw,26px)/1.2 var(--disp);margin:12px 0 18px}
+.rules{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:12px}
+.rules li{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;color:var(--mut)}
+.rules li b{color:var(--ink)}
+.rules i{font-style:normal;flex:0 0 auto;min-width:46px;height:30px;display:grid;place-items:center;
+  font:700 12px var(--mono);color:var(--cyan);border:1px solid rgba(62,230,255,.4);
+  background:rgba(62,230,255,.08);border-radius:8px;box-shadow:0 0 10px rgba(62,230,255,.15)}
+.att-note{font:600 13px var(--mono);color:var(--amber);margin:0 0 14px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);margin:0 0 16px;cursor:pointer}
+.agree input{width:20px;height:20px;accent-color:var(--cyan);margin-top:1px;flex:0 0 auto}
+
+/* ---- Экран теста ---- */
+.tbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 2px 12px;margin-bottom:10px;background:rgba(5,8,16,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mini{width:44px;height:26px;flex:0 0 auto}
+.mini path{stroke-width:2.4;stroke-dasharray:6 8;animation-duration:2.2s}
+.bt b{display:block;font:700 13px var(--disp);white-space:nowrap}
+.bt span{font:500 11px var(--mono);color:var(--mut)}
+.timer{position:relative;width:56px;height:56px;flex:0 0 auto}
+.timer svg{width:56px;height:56px;display:block}
+.tr-bg{fill:none;stroke:#1b2a55;stroke-width:5}
+.tr-fg{fill:none;stroke:var(--cyan);stroke-width:5;stroke-linecap:round;stroke-dasharray:157.08;
+  transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke .4s;filter:drop-shadow(0 0 5px rgba(62,230,255,.6))}
+.timer.warn .tr-fg{stroke:var(--amber)}
+.timer.danger .tr-fg{stroke:var(--red)}
+.timer.danger{animation:pulse .8s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+#tTxt{position:absolute;inset:0;display:grid;place-items:center;font:700 13px var(--mono)}
+
+#prog{display:flex;gap:5px;margin:2px 2px 14px}
+#prog i{flex:1;height:5px;border-radius:3px;background:#141f45;transition:.35s}
+#prog i.done{background:var(--cyan);box-shadow:0 0 8px rgba(62,230,255,.7)}
+#prog i.cur{background:var(--mag);box-shadow:0 0 8px rgba(255,61,207,.8)}
+
+.qcard{animation:rise .45s ease both}
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.qnum{font:700 14px var(--disp);color:var(--mut)}
+.qnum b{color:var(--ink);font-size:20px}
+.qnum em{font-style:normal;color:var(--dim)}
+.qtext{font:600 clamp(16.5px,4.6vw,20px)/1.5 var(--body);margin:0 0 14px}
+
+.fig{background:#070d1f;border:1px solid var(--line);border-radius:14px;padding:10px;margin:0 0 16px}
+.qsvg{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:#0a1124;
+  border:1px solid var(--line);border-radius:14px;padding:13px 14px;color:var(--ink);
+  font:500 15px/1.45 var(--body);cursor:pointer;transition:transform .2s,border-color .25s,box-shadow .25s,background .25s;
+  animation:pop .4s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.opt:hover{transform:translateY(-2px);border-color:rgba(62,230,255,.5);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.opt:active{transform:scale(.985)}
+.opt .key{flex:0 0 30px;height:30px;display:grid;place-items:center;border-radius:9px;border:1px solid var(--line2);
+  font:700 13px var(--disp);color:var(--mut);transition:.25s}
+.opt.lit{border-color:var(--cyan);background:linear-gradient(180deg,rgba(62,230,255,.13),rgba(62,230,255,.04));
+  box-shadow:0 0 0 1px rgba(62,230,255,.6),0 0 22px rgba(62,230,255,.35),inset 0 0 18px rgba(62,230,255,.08)}
+.opt.lit .key{background:var(--cyan);color:#04121f;border-color:var(--cyan);box-shadow:0 0 14px rgba(62,230,255,.8)}
+
+.calc-row{display:flex;gap:10px;align-items:stretch}
+#calcInput{flex:1;background:#0a1124;border:1px solid var(--line2);border-radius:14px;color:var(--ink);
+  font:600 20px var(--mono);padding:12px 16px;outline:none;min-width:0;transition:border-color .25s,box-shadow .25s}
+#calcInput:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(62,230,255,.14),0 0 20px rgba(62,230,255,.22)}
+.unit{display:grid;place-items:center;padding:0 16px;border-radius:14px;border:1px solid rgba(255,194,71,.4);
+  background:rgba(255,194,71,.08);color:var(--amber);font:700 15px var(--mono);text-shadow:0 0 10px rgba(255,194,71,.5)}
+.hint{font-size:12.5px;color:var(--dim);margin:10px 0 0}
+
+/* ---- Результаты ---- */
+.res{text-align:center;border-top:3px solid var(--cyan)}
+.res.bad{border-top-color:var(--red)}
+.res-badge{display:inline-block;font:600 11px var(--body);letter-spacing:.16em;text-transform:uppercase;
+  padding:7px 14px;border-radius:999px;border:1px solid rgba(62,230,255,.4);color:var(--cyan);
+  background:rgba(62,230,255,.07);margin-bottom:18px}
+.res.bad .res-badge{border-color:rgba(255,77,107,.5);color:var(--red);background:rgba(255,77,107,.08)}
+.res-score{font:900 clamp(56px,16vw,84px)/1 var(--disp);color:var(--lime);
+  text-shadow:0 0 24px rgba(83,255,157,.55),0 0 60px rgba(83,255,157,.25)}
+.res.bad .res-score{color:var(--amber);text-shadow:0 0 24px rgba(255,194,71,.55)}
+.res-score .of{font-size:.38em;color:var(--dim);font-weight:700;margin-left:8px}
+.res-bar{display:flex;gap:5px;max-width:340px;margin:20px auto}
+.res-bar i{flex:1;height:8px;border-radius:4px;background:#141f45}
+.res-bar i.ok{background:var(--lime);box-shadow:0 0 9px rgba(83,255,157,.8)}
+.res-verdict{font:700 17px var(--disp);margin:4px 0 20px}
+.res-meta{margin:0 0 18px;text-align:left;display:grid;gap:9px}
+.res-meta div{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.res-meta dt{color:var(--dim);font-size:13.5px}
+.res-meta dd{margin:0;font-weight:600;font-size:14.5px;text-align:right}
+.res-note{font:500 12.5px var(--mono);color:var(--mut);margin:0 0 18px}
+
+/* ---- Модалка предупреждения ---- */
+#warn{position:fixed;inset:0;z-index:60;display:none;place-items:center;padding:20px;
+  background:rgba(4,6,15,.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+#warn.on{display:grid}
+.wcard{max-width:430px;width:100%;border-color:rgba(255,194,71,.5);box-shadow:0 0 44px rgba(255,194,71,.22);
+  text-align:center;animation:rise .35s ease both}
+.wcard .wico{font-size:40px;line-height:1;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(255,194,71,.7))}
+.wcard h3{font:700 20px var(--disp);margin:0 0 10px;color:var(--amber)}
+.wcard p{color:var(--mut);font-size:14.5px;margin:0 0 18px}
+.btn-warn{background:linear-gradient(135deg,#ffcf6b,#ff9f2e);color:#241300;box-shadow:0 6px 24px rgba(255,170,60,.35)}
+
+/* ---- Тост ---- */
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));z-index:70;
+  transform:translateX(-50%) translateY(24px);opacity:0;pointer-events:none;
+  background:#0c1430;border:1px solid var(--cyan);color:var(--ink);border-radius:12px;
+  padding:12px 18px;font:600 14px var(--body);box-shadow:0 0 22px rgba(62,230,255,.35);transition:.35s;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+:focus-visible{outline:2px solid rgba(62,230,255,.7);outline-offset:2px}
+button{font-family:var(--body);user-select:none;-webkit-user-select:none}
+
+@media (min-width:880px){
+  .wrap{padding-top:44px}
+  .reg-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start}
+  .card{padding:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="bgGrid" aria-hidden="true"></div>
+<div class="orb a" aria-hidden="true"></div>
+<div class="orb b" aria-hidden="true"></div>
+
+<main class="wrap">
+
+  <!-- ═══════════ ЭКРАН 1 • РЕГИСТРАЦИЯ ═══════════ -->
+  <section class="screen on" id="scr-reg">
+    <div class="reg-grid">
+      <div>
+        <div class="chips"><span class="chip">Физика · 10 класс</span><span class="chip mg">ЦО 10.1.5.1</span></div>
+        <svg class="emblem" viewBox="0 0 220 84" aria-hidden="true">
+          <path class="f1" d="M4 16 C 60 6, 120 28, 216 12"/>
+          <path class="f2" d="M4 38 C 62 26, 122 50, 216 36"/>
+          <path class="f3" d="M4 60 C 60 50, 124 72, 216 58"/>
+          <path class="f4" d="M4 78 C 64 70, 126 88, 216 76" opacity=".55"/>
+        </svg>
+        <h1>Кинематика <span class="neon">жидкости</span></h1>
+        <p class="lead">Гидро- и аэродинамика · идеальная и вязкая жидкость · линии и трубка тока · ламинарное и турбулентное течение · движение тел в жидкостях и газах · формула Стокса.</p>
+        <div class="card teach">
+          <div class="ava">КД</div>
+          <div><span class="lbl">Учитель физики</span><b>Кунгозин Даулет Багдашұлы</b></div>
+        </div>
+      </div>
+
+      <form class="card form" id="regForm" novalidate>
+        <label class="field"><span class="lbl">ФИ учащегося *</span>
+          <input id="regFio" type="text" autocomplete="off" placeholder="Фамилия Имя " maxlength="80">
+        </label>
+        <div class="grid2">
+          <label class="field"><span class="lbl">Класс *</span>
+            <select id="regClass">
+              <option value="" disabled selected>— выбери —</option>
+              <option value="10 Б">10 Б</option>
+              <option value="10 В">10 В</option>
+            </select>
+          </label>
+          <label class="field"><span class="lbl">Вариант *</span>
+            <select id="regVar">
+              <option value="" disabled selected>— выбери —</option>
+              <option value="Вариант 1">Вариант 1</option>
+              <option value="Вариант 2">Вариант 2</option>
+            </select>
+          </label>
+        </div>
+        <p class="att-info" id="regAtt"></p>
+        <button class="btn btn-primary" id="btnToDisc" type="button">Продолжить →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ═══════════ ЭКРАН 2 • ДИСКЛЕЙМЕР ═══════════ -->
+  <section class="screen" id="scr-disc">
+    <div class="card disc">
+      <span class="chip am">Академическая честность</span>
+      <h2>Условия прохождения теста</h2>
+      <ul class="rules">
+        <li><i>10</i><span>заданий: 6 с выбором ответа (из них 3 — по рисункам и графикам) и 4 расчётные задачи. Максимум — <b>10 баллов</b>, по 1 баллу за задание.</span></li>
+        <li><i>90 с</i><span>на каждый вопрос. По истечении таймера происходит <b>автоматический переход</b> к следующему вопросу.</span></li>
+        <li><i>←</i><span>возврат к предыдущим вопросам <b>запрещён</b>, кнопка «Назад» отсутствует.</span></li>
+        <li><i>π</i><span>в расчётных задачах принимай <b>π ≈ 3</b>. Ответ — <b>число без единиц измерения</b> (точка или запятая).</span></li>
+        <li><i>⚠</i><span>сворачивание вкладки или переключение на другое приложение: <b>1-й раз — предупреждение</b>, <b>2-й раз — тест завершается автоматически</b>.</span></li>
+        <li><i>✎</i><span>выполняй тест <b>самостоятельно</b>. Использование подсказок и посторонней помощи — нарушение академической честности.</span></li>
+      </ul>
+      <p class="att-note" id="discAtt"></p>
+      <label class="agree">
+        <input type="checkbox" id="discAgree">
+        <span>Я прочитал(а) и принимаю условия, выполню тест самостоятельно</span>
+      </label>
+      <button class="btn btn-primary" id="btnStart" disabled>Начать тест</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ ЭКРАН 3 • ТЕСТ ═══════════ -->
+  <section class="screen" id="scr-test">
+    <header class="tbar">
+      <div class="brand">
+        <svg class="mini" viewBox="0 0 46 26" aria-hidden="true">
+          <path class="f1" d="M2 5 C 16 1 28 9 44 4"/>
+          <path class="f2" d="M2 13 C 16 9 28 17 44 12"/>
+          <path class="f3" d="M2 21 C 16 17 28 25 44 20"/>
+        </svg>
+        <div class="bt"><b>Кинематика жидкости</b><span id="hVar">—</span></div>
+      </div>
+      <div class="timer" id="timerBox">
+        <svg viewBox="0 0 60 60" aria-hidden="true">
+          <circle class="tr-bg" cx="30" cy="30" r="25"/>
+          <circle class="tr-fg" id="tRing" cx="30" cy="30" r="25"/>
+        </svg>
+        <span id="tTxt">1:30</span>
+      </div>
+    </header>
+
+    <div id="prog" aria-hidden="true"></div>
+
+    <article class="card qcard" id="qcard">
+      <div class="qhead">
+        <span class="qnum">Вопрос <b id="qNum">1</b> <em>/ 10</em></span>
+        <span class="chip" id="qChip">Тест</span>
+      </div>
+      <h3 class="qtext" id="qText"></h3>
+      <div class="fig" id="figBox" hidden></div>
+
+      <div class="opts" id="optBox"></div>
+
+      <div id="calcBox" hidden>
+        <div class="calc-row">
+          <input id="calcInput" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0.0" aria-label="Ответ числом">
+          <span class="unit" id="unitChip">Н</span>
+        </div>
+        <p class="hint">Ответ — число без единиц измерения. Дробная часть — через точку или запятую.</p>
+      </div>
+
+      <button class="btn btn-next" id="nextBtn" type="button" disabled>Далее →</button>
+    </article>
+  </section>
+
+  <!-- ═══════════ ЭКРАН 4 • РЕЗУЛЬТАТЫ ═══════════ -->
+  <section class="screen" id="scr-res">
+    <div class="card res" id="resCard">
+      <div class="res-badge" id="resBadge">Тест завершён</div>
+      <div class="res-score"><span id="resScore">0</span><span class="of">/ 10</span></div>
+      <div class="res-bar" id="resBar"></div>
+      <div class="res-verdict" id="resVerdict"></div>
+      <dl class="res-meta">
+        <div><dt>ФИ учащегося</dt><dd id="resFio">—</dd></div>
+        <div><dt>Класс</dt><dd id="resClass">—</dd></div>
+        <div><dt>Вариант</dt><dd id="resVar">—</dd></div>
+        <div><dt>Использовано попыток</dt><dd id="resAtt">—</dd></div>
+        <div><dt>Статус</dt><dd id="resStatus">—</dd></div>
+      </dl>
+      <p class="res-note" id="resNote"></p>
+      <button class="btn btn-primary" id="btnAgain" type="button">Пройти заново</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════ МОДАЛКА • ПРЕДУПРЕЖДЕНИЕ АНТИЧИТА ═══════════ -->
+<div id="warn" role="alertdialog" aria-modal="true">
+  <div class="card wcard">
+    <div class="wico">⚠</div>
+    <h3 id="warnTitle">Предупреждение</h3>
+    <p>Зафиксирован уход со страницы теста (вкладка свёрнута или открыто другое приложение).<br><br>
+    При <b>повторном</b> нарушении тест будет завершён автоматически, а попытка засчитана с текущим результатом.</p>
+    <button class="btn btn-warn" id="warnBtn" type="button">Понятно, продолжаю</button>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════
+   НАСТРОЙКА: вставь сюда URL развёртывания Google Apps Script
+   (заканчивается на /exec). Инструкция — в конце файла.
+   ════════════════════════════════════════════════════════════ */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxbkadfTL5wgpDlyTsnqEE-CVuwmG_ry7fstRyIfGnhSnaa1AE1eEvO3AZszq6YO4XR4A/exec';
+
+const TIME_Q  = 90;                       // секунд на вопрос (1,5 минуты)
+const TOTAL   = 10;
+const TEACHER = 'Кунгозин Даулет Багдашұлы';
+const $ = id => document.getElementById(id);
+
+/* ═══════════ SVG-ГРАФИКА (в клетку, с осями и подписями) ═══════════ */
+const F = 'font-family="Rubik, sans-serif"';
+const zero = (ox,oy)=>`<text x="${ox-7}" y="${oy+15}" text-anchor="end" font-size="10" fill="#7f93cf" ${F}>0</text>`;
+const wrapSVG = (vb,inner)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" class="qsvg" role="img">${inner}</svg>`;
+
+const baseSVG = o => `
+<defs>
+  <pattern id="${o.pid}" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="translate(${o.tx} ${o.ty})">
+    <path d="M20 0H0V20" fill="none" stroke="#1d2b57" stroke-width="1"/>
+  </pattern>
+  <marker id="${o.pid}_ax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="#7288cc"/>
+  </marker>
+</defs>
+<rect x="${o.rx}" y="${o.ry}" width="${o.rw}" height="${o.rh}" fill="url(#${o.pid})"/>
+<rect x="${o.rx}" y="${o.ry}" width="${o.rw}" height="${o.rh}" fill="none" stroke="#24366e" stroke-width="1"/>
+<line x1="${o.ox}" y1="${o.oy}" x2="${o.xe}" y2="${o.oy}" stroke="#7288cc" stroke-width="1.6" marker-end="url(#${o.pid}_ax)"/>
+<line x1="${o.ox}" y1="${o.oy}" x2="${o.ox}" y2="${o.ye}" stroke="#7288cc" stroke-width="1.6" marker-end="url(#${o.pid}_ax)"/>
+${o.xt.map(t=>`<line x1="${t[0]}" y1="${o.oy}" x2="${t[0]}" y2="${o.oy+4}" stroke="#7288cc" stroke-width="1"/><text x="${t[0]}" y="${o.oy+15}" text-anchor="middle" font-size="10" fill="#7f93cf" ${F}>${t[1]}</text>`).join('')}
+${o.yt.map(t=>`<line x1="${o.ox-4}" y1="${t[0]}" x2="${o.ox}" y2="${t[0]}" stroke="#7288cc" stroke-width="1"/><text x="${o.ox-7}" y="${t[0]+3}" text-anchor="end" font-size="10" fill="#7f93cf" ${F}>${t[1]}</text>`).join('')}
+<text x="${o.xe-2}" y="${o.oy+28}" text-anchor="end" font-size="12" font-style="italic" fill="#9fb4ea" ${F}>${o.xl}</text>
+<text x="${o.ox+9}" y="${o.ye+4}" font-size="12" font-style="italic" fill="#9fb4ea" ${F}>${o.yl}</text>`;
+
+/* —— кадр с осями x(см), y(см) для картин течений —— */
+const FRAME_A = {ox:48,oy:212,rx:48,ry:14,rw:298,rh:198,xe:344,ye:18,
+  xt:[[88,'2'],[128,'4'],[168,'6'],[208,'8'],[248,'10'],[288,'12'],[328,'14']],
+  yt:[[172,'2'],[132,'4'],[92,'6'],[52,'8']], xl:'x, см', yl:'y, см'};
+
+/* —— В1, вопрос 4: ламинарное течение (параллельные линии тока) —— */
+const IMG_V1Q4 = (()=>{
+  const mk = `<defs><marker id="gA4_fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3ee6ff"/></marker></defs>`;
+  const lines = [52,92,132,172].map(y=>`<polyline points="60,${y} 195,${y} 326,${y}" fill="none" stroke="#3ee6ff" stroke-width="2.6" stroke-linecap="round" marker-mid="url(#gA4_fl)" marker-end="url(#gA4_fl)"/>`).join('');
+  return wrapSVG('0 0 360 250', baseSVG({...FRAME_A,pid:'gA4',tx:8,ty:12}) + zero(48,212) + mk + lines);
+})();
+
+/* —— В1, вопрос 5: v(t) шарика, участки А и Б —— */
+const FRAME_B = {ox:52,oy:222,rx:52,ry:22,rw:290,rh:200,xe:340,ye:24,
+  xt:[[98,'1'],[144,'2'],[190,'3'],[236,'4'],[282,'5'],[328,'6']],
+  yt:[[174,'1'],[126,'2'],[78,'3'],[30,'4']], xl:'t, с', yl:'v, м/с'};
+const IMG_V1Q5 = (()=> wrapSVG('0 0 360 262',
+  baseSVG({...FRAME_B,pid:'gB5',tx:12,ty:2}) + zero(52,222) + `
+  <path d="M52 222 C 84 130 112 82 144 78 L 328 78" fill="none" stroke="#ff3dcf" stroke-width="9" opacity="0.14"/>
+  <path d="M52 222 C 84 130 112 82 144 78 L 328 78" fill="none" stroke="#ff3dcf" stroke-width="3" stroke-linecap="round"/>
+  <line x1="144" y1="78" x2="144" y2="222" stroke="#8fa3d9" stroke-width="1" stroke-dasharray="4 4" opacity="0.55"/>
+  <circle cx="144" cy="78" r="3.6" fill="#ffc247"/>
+  <text x="102" y="158" font-size="16" font-weight="700" fill="#ffc247" ${F}>А</text>
+  <text x="230" y="66" font-size="16" font-weight="700" fill="#ffc247" ${F}>Б</text>`))();
+
+/* —— В1, вопрос 6: трубка тока (сужение), точки 1–2–3 —— */
+const FRAME_C = {ox:48,oy:206,rx:48,ry:12,rw:298,rh:194,xe:344,ye:16,
+  xt:[[88,'2'],[128,'4'],[168,'6'],[208,'8'],[248,'10'],[288,'12'],[328,'14']],
+  yt:[[166,'2'],[126,'4'],[86,'6'],[46,'8']], xl:'x, см', yl:'y, см'};
+const IMG_V1Q6 = (()=>{
+  const mk = `<defs><marker id="gC6_fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3ee6ff"/></marker></defs>`;
+  const sl = d => `<path d="${d}" fill="none" stroke="#3ee6ff" stroke-width="2.4" stroke-linecap="round" marker-end="url(#gC6_fl)"/>`;
+  const pts = [[110,'1'],[198,'2'],[292,'3']].map(([x,n])=>
+    `<circle cx="${x}" cy="110" r="4.6" fill="#0a1124" stroke="#ffc247" stroke-width="2"/><text x="${x}" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#ffc247" paint-order="stroke" stroke="#060b1a" stroke-width="4" ${F}>${n}</text>`).join('');
+  return wrapSVG('0 0 360 248', baseSVG({...FRAME_C,pid:'gC6',tx:8,ty:6}) + zero(48,206) + mk
+    + sl('M56 40 C116 40 148 90 198 90 S 280 40 340 40')
+    + sl('M56 75 C116 75 148 100 198 100 S 280 75 340 75')
+    + sl('M56 110 L 336 110')
+    + sl('M56 145 C116 145 148 120 198 120 S 280 145 340 145')
+    + sl('M56 180 C116 180 148 130 198 130 S 280 180 340 180') + pts);
+})();
+
+/* —— В2, вопрос 4: турбулентное течение (хаос + вихри) —— */
+const IMG_V2Q4 = (()=>{
+  const mk = `<defs>
+    <marker id="gD4_c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3ee6ff"/></marker>
+    <marker id="gD4_m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ff3dcf"/></marker></defs>`;
+  return wrapSVG('0 0 360 250', baseSVG({...FRAME_A,pid:'gD4',tx:8,ty:12}) + zero(48,212) + mk + `
+  <path d="M56 190 C 92 120 122 208 162 148 S 232 66 270 118 S 322 172 342 98" fill="none" stroke="#3ee6ff" stroke-width="2.6" stroke-linecap="round" marker-end="url(#gD4_c)"/>
+  <path d="M56 62 C 108 112 128 30 178 84 S 258 192 342 148" fill="none" stroke="#ff3dcf" stroke-width="2.6" stroke-linecap="round" marker-end="url(#gD4_m)"/>
+  <path d="M66 122 C 118 60 158 172 208 122 S 300 58 336 128" fill="none" stroke="#3ee6ff" stroke-width="2" opacity="0.75" stroke-linecap="round" marker-end="url(#gD4_c)"/>
+  <path d="M166 44 A 15 15 0 1 0 182 62" fill="none" stroke="#3ee6ff" stroke-width="2.4" marker-end="url(#gD4_c)"/>
+  <path d="M272 168 A 14 14 0 1 1 252 186" fill="none" stroke="#ff3dcf" stroke-width="2.4" marker-end="url(#gD4_m)"/>`);
+})();
+
+/* —— В2, вопрос 5: две кривые разгона (разная вязкость) —— */
+const FRAME_E = {ox:52,oy:222,rx:52,ry:22,rw:290,rh:200,xe:340,ye:24,
+  xt:[[98,'1'],[144,'2'],[190,'3'],[236,'4'],[282,'5'],[328,'6']],
+  yt:[[184,'1'],[146,'2'],[108,'3'],[70,'4'],[32,'5']], xl:'t, с', yl:'v, м/с'};
+const IMG_V2Q5 = (()=> wrapSVG('0 0 360 262',
+  baseSVG({...FRAME_E,pid:'gE5',tx:12,ty:2}) + zero(52,222) + `
+  <path d="M52 222 C 82 118 110 74 152 70 L 326 70" fill="none" stroke="#3ee6ff" stroke-width="8" opacity="0.14"/>
+  <path d="M52 222 C 82 118 110 74 152 70 L 326 70" fill="none" stroke="#3ee6ff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M52 222 C 92 192 122 150 172 146 L 326 146" fill="none" stroke="#ff3dcf" stroke-width="8" opacity="0.14"/>
+  <path d="M52 222 C 92 192 122 150 172 146 L 326 146" fill="none" stroke="#ff3dcf" stroke-width="3" stroke-linecap="round"/>
+  <text x="331" y="63" font-size="15" font-weight="700" fill="#3ee6ff" ${F}>1</text>
+  <text x="331" y="139" font-size="15" font-weight="700" fill="#ff3dcf" ${F}>2</text>`))();
+
+/* —— В2, вопрос 6: параболический профиль скорости в трубе —— */
+const FRAME_F = {ox:52,oy:222,rx:52,ry:22,rw:280,rh:200,xe:340,ye:20,
+  xt:[[87,'1'],[122,'2'],[157,'3'],[192,'4'],[227,'5'],[262,'6'],[297,'7'],[332,'8']],
+  yt:[[182,'1'],[142,'2'],[102,'3'],[62,'4'],[22,'5']], xl:'x, см', yl:'v, м/с'};
+const IMG_V2Q6 = (()=> wrapSVG('0 0 360 262',
+  baseSVG({...FRAME_F,pid:'gF6',tx:12,ty:2}) + zero(52,222) + `
+  <path d="M52 222 Q 192 -98 332 222" fill="none" stroke="#ff3dcf" stroke-width="9" opacity="0.14"/>
+  <path d="M52 222 Q 192 -98 332 222" fill="none" stroke="#ff3dcf" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="192" cy="62" r="4" fill="#ffc247"/>`))();
+
+/* ═══════════ БАНК ВОПРОСОВ (сначала тестовые, затем расчётные) ═══════════ */
+const BANK = {
+ v1: [
+  {k:'mcq', q:'Идеальная жидкость — это модель жидкости, у которой…',
+   o:['плотность очень велика','отсутствует внутреннее трение (вязкость)','она не течёт и сохраняет свою форму','она существует только при низких температурах'], a:1},
+  {k:'mcq', q:'Течение жидкости называется стационарным, если…',
+   o:['жидкость движется строго горизонтально','давление жидкости одинаково во всех точках потока','скорость частиц жидкости в каждой точке потока не изменяется с течением времени','скорости всех частиц жидкости одинаковы'], a:2},
+  {k:'mcq', q:'Ламинарное течение — это течение, при котором…',
+   o:['жидкость интенсивно перемешивается и образуются вихри','скорость жидкости во всех точках всегда одинакова','жидкость движется только под действием силы тяжести','отдельные слои жидкости движутся, не перемешиваясь'], a:3},
+  {k:'fig', img:IMG_V1Q4, q:'На рисунке изображены линии тока жидкости. Какой тип течения соответствует этой картине?',
+   o:['турбулентное','нестационарное','ламинарное стационарное','вихревое'], a:2},
+  {k:'fig', img:IMG_V1Q5, q:'На графике показана зависимость скорости v шарика, падающего в вязкой жидкости, от времени t. На каком участке шарик движется равномерно (равнодействующая сил равна нулю)?',
+   o:['на участке А','на всём протяжении движения','ни на одном участке','на участке Б'], a:3},
+  {k:'fig', img:IMG_V1Q6, q:'На рисунке показаны линии тока стационарного течения идеальной жидкости. В какой точке скорость течения жидкости наибольшая?',
+   o:['1','2','3','скорость одинакова во всех точках'], a:1},
+  {k:'calc', q:'Шарик радиусом 0,1 м равномерно движется в вязкой жидкости со скоростью 2 м/с. Коэффициент внутреннего трения жидкости η = 0,5 Па·с. Определи силу сопротивления, действующую на шарик. Прими π = 3. Ответ запиши числом в ньютонах.', a:1.8, unit:'Н'},
+  {k:'calc', q:'Шарик радиусом 0,1 м равномерно движется в жидкости со скоростью 2 м/с. Сила сопротивления, действующая на шарик, равна 3,6 Н. Определи коэффициент внутреннего трения жидкости. Прими π = 3. Ответ запиши числом в Па·с.', a:1, unit:'Па·с'},
+  {k:'calc', q:'Шарик равномерно движется в жидкости с коэффициентом внутреннего трения η = 0,5 Па·с со скоростью 3 м/с. Сила сопротивления, действующая на шарик, равна 2,7 Н. Определи радиус шарика. Прими π = 3. Ответ запиши числом в метрах.', a:0.1, unit:'м'},
+  {k:'calc', q:'Шарик радиусом 0,1 м равномерно падает в вязкой жидкости с коэффициентом внутреннего трения η = 0,2 Па·с. Сила сопротивления, действующая на шарик, равна 3,6 Н. Определи скорость движения шарика. Прими π = 3. Ответ запиши числом в м/с.', a:10, unit:'м/с'}
+ ],
+ v2: [
+  {k:'mcq', q:'Вязкость — это свойство жидкости…',
+   o:['передавать давление одинаково во всех направлениях','оказывать сопротивление относительному перемещению её слоёв','испаряться со свободной поверхности','изменять свою массу при течении'], a:1},
+  {k:'mcq', q:'Линия тока — это проведённая в движущейся жидкости линия, у которой…',
+   o:['касательная в каждой точке совпадает с направлением скорости жидкости в этой точке','скорость частиц жидкости одинакова во всех её точках','давление жидкости одинаково во всех её точках','по ней частицы движутся только при турбулентном течении'], a:0},
+  {k:'mcq', q:'Турбулентное течение — это течение, при котором…',
+   o:['слои жидкости движутся параллельно, не перемешиваясь','скорость жидкости в каждой точке не изменяется со временем','образуются вихри и жидкость интенсивно перемешивается','жидкость движется только по прямой трубе'], a:2},
+  {k:'fig', img:IMG_V2Q4, q:'На рисунке изображена картина течения жидкости. Какой тип течения показан?',
+   o:['ламинарное','стационарное','равномерное','турбулентное'], a:3},
+  {k:'fig', img:IMG_V2Q5, q:'Два одинаковых маленьких шарика падают в жидкостях с различной вязкостью. На графике показаны зависимости их скоростей от времени. Какая кривая соответствует шарику, движущемуся в жидкости с большей вязкостью?',
+   o:['кривая 1','кривая 2','обе кривые','ни одна из кривых'], a:1},
+  {k:'fig', img:IMG_V2Q6, q:'На графике показана зависимость скорости v слоёв вязкой жидкости от расстояния x до стенки трубы при стационарном ламинарном течении. Чему равна максимальная скорость течения жидкости?',
+   o:['2 м/с','4 м/с','3 м/с','5 м/с'], a:1},
+  {k:'calc', q:'Шарик радиусом 0,05 м равномерно движется в вязкой жидкости со скоростью 5 м/с. Коэффициент внутреннего трения жидкости η = 0,2 Па·с. Определи силу сопротивления, действующую на шарик. Прими π = 3. Ответ запиши числом в ньютонах.', a:0.9, unit:'Н'},
+  {k:'calc', q:'Шарик радиусом 0,05 м равномерно движется в жидкости со скоростью 5 м/с. Сила сопротивления, действующая на него, равна 2,7 Н. Определи коэффициент внутреннего трения жидкости. Прими π = 3. Ответ запиши числом в Па·с.', a:0.6, unit:'Па·с'},
+  {k:'calc', q:'Шарик равномерно движется в жидкости с коэффициентом внутреннего трения η = 0,5 Па·с со скоростью 2,5 м/с. Сила сопротивления, действующая на шарик, равна 4,5 Н. Определи радиус шарика. Прими π = 3. Ответ запиши числом в метрах.', a:0.2, unit:'м'},
+  {k:'calc', q:'Шарик радиусом 0,05 м равномерно падает в вязкой жидкости с коэффициентом внутреннего трения η = 0,5 Па·с. Сила сопротивления, действующая на него, равна 2,7 Н. Определи скорость движения шарика. Прими π = 3. Ответ запиши числом в м/с.', a:6, unit:'м/с'}
+ ]
+};
+
+/* ═══════════ СОСТОЯНИЕ ═══════════ */
+const S = {
+  active:false, finished:false, locked:false, paused:false,
+  idx:0, sel:null, answers:[], Q:[], meta:{},
+  remaining:TIME_Q*1000, timerId:0,
+  violations:0, pendingWarn:false, isHidden:document.hidden,
+  startedAt:0, attemptNo:0, closedSent:false
+};
+
+/* ═══════════ ХРАНИЛИЩЕ ПОПЫТОК ═══════════ */
+const attKey = (f,c)=>'kfz_att::'+f.trim().toLowerCase().replace(/\s+/g,' ')+'::'+c;
+const getAtt = k => { try{ return parseInt(localStorage.getItem(k)||'0',10); }catch(e){ return 0; } };
+const incAtt = k => { const n = getAtt(k)+1; try{ localStorage.setItem(k, String(n)); }catch(e){} return n; };
+
+/* ═══════════ НАВИГАЦИЯ ПО ЭКРАНАМ ═══════════ */
+const show = id => {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+let toastT = 0;
+const toast = msg => {
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('on'), 2600);
+};
+
+/* ═══════════ ЭКРАН РЕГИСТРАЦИИ ═══════════ */
+const fioValid = v => /[а-яёА-ЯЁa-zA-Z]{2,}/.test(v) && v.trim().length >= 5;
+
+function updateAttInfo(){
+  const f = $('regFio').value, c = $('regClass').value;
+  $('regAtt').textContent = (fioValid(f) && c)
+    ? `Использовано попыток: ${getAtt(attKey(f,c))}` : '';
+}
+['regFio','regClass','regVar'].forEach(id => {
+  $(id).addEventListener('input', updateAttInfo);
+  $(id).addEventListener('change', updateAttInfo);
+});
+
+$('btnToDisc').addEventListener('click', ()=>{
+  const fio = $('regFio').value.trim();
+  if(!fioValid(fio)) return toast('Введи ФИ полностью');
+  if(!$('regClass').value) return toast('Выбери класс');
+  if(!$('regVar').value)   return toast('Выбери вариант');
+  S.meta = { fio, klass:$('regClass').value, variant:$('regVar').value };
+  $('discAtt').textContent = `Это будет попытка № ${getAtt(attKey(fio,S.meta.klass))+1}`;
+  show('scr-disc');
+});
+
+$('discAgree').addEventListener('change', e => { $('btnStart').disabled = !e.target.checked; });
+
+$('btnStart').addEventListener('click', ()=>{
+  S.attemptNo = incAtt(attKey(S.meta.fio, S.meta.klass));
+  Object.assign(S, {
+    active:true, finished:false, locked:false, paused:false,
+    idx:0, sel:null, answers:[], violations:0, pendingWarn:false,
+    Q: BANK[ S.meta.variant === 'Вариант 1' ? 'v1' : 'v2' ],
+    startedAt: Date.now(), closedSent:false
+  });
+  $('hVar').textContent = `${S.meta.klass} · ${S.meta.variant}`;
+  show('scr-test');
+  renderQ();
+});
+
+/* ═══════════ ПРОГРЕСС ═══════════ */
+for(let i=0;i<TOTAL;i++) $('prog').appendChild(document.createElement('i'));
+const renderProg = () => [...$('prog').children].forEach((el,i)=>{
+  el.className = i < S.idx ? 'done' : (i === S.idx ? 'cur' : '');
+});
+
+/* ═══════════ ТАЙМЕР (1,5 минуты на вопрос) ═══════════ */
+function startTimer(){
+  clearInterval(S.timerId);
+  S.remaining = TIME_Q*1000; S.paused = false;
+  updateTimerUI();
+  S.timerId = setInterval(()=>{
+    if(S.paused || !S.active) return;
+    S.remaining -= 100;
+    if(S.remaining <= 0){ S.remaining = 0; updateTimerUI(); timeUp(); }
+    else updateTimerUI();
+  }, 100);
+}
+function updateTimerUI(){
+  const s = Math.ceil(S.remaining/1000);
+  $('tTxt').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  $('tRing').style.strokeDashoffset = String(157.08 * (1 - S.remaining/(TIME_Q*1000)));
+  const box = $('timerBox');
+  box.classList.toggle('warn',   s <= 30 && s > 10);
+  box.classList.toggle('danger', s <= 10);
+}
+const stopTimer = () => clearInterval(S.timerId);
+
+function timeUp(){
+  if(S.locked) return;
+  S.locked = true;
+  S.answers[S.idx] = capture();           // выбранный/введённый ответ, если был, засчитывается
+  toast('⏱ Время вышло — переход к следующему вопросу');
+  setTimeout(advance, 850);
+}
+
+/* ═══════════ РЕНДЕР ВОПРОСА ═══════════ */
+const LETTERS = ['А','Б','В','Г'];
+function renderQ(){
+  const q = S.Q[S.idx];
+  S.sel = null; S.locked = false;
+  $('qNum').textContent = S.idx + 1;
+  const chip = $('qChip');
+  if(q.k === 'calc'){ chip.textContent = 'Задача'; chip.className = 'chip am'; }
+  else if(q.img)    { chip.textContent = 'Рисунок · график'; chip.className = 'chip mg'; }
+  else              { chip.textContent = 'Тест'; chip.className = 'chip'; }
+
+  $('qText').textContent = q.q;
+  $('figBox').hidden = !q.img;
+  $('figBox').innerHTML = q.img || '';
+
+  const nb = $('nextBtn');
+  nb.disabled = true; nb.classList.remove('armed');
+  nb.textContent = (S.idx === TOTAL-1) ? 'Завершить ✓' : 'Далее →';
+
+  if(q.k === 'calc'){
+    $('optBox').hidden = true; $('optBox').innerHTML = '';
+    $('calcBox').hidden = false;
+    $('calcInput').value = '';
+    $('unitChip').textContent = q.unit;
+  } else {
+    $('calcBox').hidden = true;
+    $('optBox').hidden = false;
+    $('optBox').innerHTML = q.o.map((t,i)=>
+      `<button type="button" class="opt" data-i="${i}" style="animation-delay:${i*70}ms"><span class="key">${LETTERS[i]}</span><span>${t}</span></button>`
+    ).join('');
+  }
+  renderProg();
+  const card = $('qcard');
+  card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+  startTimer();
+}
+
+/* выбор варианта */
+$('optBox').addEventListener('click', e => {
+  const b = e.target.closest('.opt');
+  if(!b || S.locked || !S.active) return;
+  S.sel = Number(b.dataset.i);
+  [...$('optBox').children].forEach(el => el.classList.toggle('lit', Number(el.dataset.i) === S.sel));
+  armNext(true);
+});
+
+/* ввод расчётного ответа */
+$('calcInput').addEventListener('input', ()=>{
+  armNext($('calcInput').value.trim() !== '');
+});
+$('calcInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !$('nextBtn').disabled) $('nextBtn').click();
+});
+
+function armNext(on){
+  const nb = $('nextBtn');
+  nb.disabled = !on;
+  nb.classList.toggle('armed', on);
+}
+
+/* ═══════════ ЗАЧЁТ ОТВЕТА (не показывается учащемуся) ═══════════ */
+function capture(){
+  const q = S.Q[S.idx];
+  if(q.k === 'calc'){
+    const raw = $('calcInput').value.trim().replace(',', '.');
+    if(!raw) return {ok:false, given:''};
+    const num = Number(raw);
+    if(!Number.isFinite(num)) return {ok:false, given:raw};
+    return {ok: Math.abs(num - q.a) < 0.005, given:raw};
+  }
+  if(S.sel === null) return {ok:false, given:null};
+  return {ok: S.sel === q.a, given:S.sel};
+}
+
+$('nextBtn').addEventListener('click', ()=>{
+  if($('nextBtn').disabled || S.locked || !S.active) return;
+  S.locked = true;
+  S.answers[S.idx] = capture();
+  setTimeout(advance, 260);
+});
+
+function advance(){
+  S.locked = false;
+  S.idx++;
+  if(S.idx >= TOTAL) finish('Тест завершён');
+  else renderQ();
+}
+
+/* ═══════════ АНТИЧИТ ══════════════════════════════════════════════
+   Реакция только на смену видимости документа (visibilitychange):
+   • открытие цифровой клавиатуры на расчётных задачах НЕ влияет
+     на document.hidden → ложных срабатываний нет (в т.ч. на iPhone);
+   • событие «blur» специально не используется — именно оно давало
+     ложные срабатывания на iOS при появлении клавиатуры.
+   1-й уход → предупреждение, 2-й уход → завершение теста.      */
+document.addEventListener('visibilitychange', ()=>{
+  const hidden = document.hidden;
+  if(hidden === S.isHidden) return;      // защита от двойных срабатываний
+  S.isHidden = hidden;
+  if(!S.active || S.finished) return;
+
+  if(hidden){
+    S.violations++;
+    if(S.violations >= 2){
+      finish('Прерван: нарушение академической честности');
+    } else {
+      S.pendingWarn = true;
+      S.paused = true;                   // таймер останавливается, пока вкладка свёрнута
+    }
+  } else if(S.pendingWarn){
+    S.pendingWarn = false;
+    $('warnTitle').textContent = `Предупреждение · нарушение 1 из 2`;
+    $('warn').classList.add('on');
+  }
+});
+
+$('warnBtn').addEventListener('click', ()=>{
+  $('warn').classList.remove('on');
+  S.paused = false;
+});
+
+/* закрытие страницы во время теста */
+window.addEventListener('pagehide', ()=>{
+  if(S.active && !S.finished){
+    S.closedSent = true;
+    if(canSend()){
+      try{ navigator.sendBeacon(SCRIPT_URL, new Blob(
+        [JSON.stringify(buildPayload('Прерван: страница закрыта'))],
+        {type:'text/plain;charset=utf-8'})); }catch(_){}
+    }
+  }
+});
+window.addEventListener('pageshow', e => {
+  if(e.persisted && S.closedSent && !S.finished){
+    finish('Прерван: страница закрыта', true);
+  }
+});
+
+/* ═══════════ ЗАВЕРШЕНИЕ И РЕЗУЛЬТАТЫ ═══════════ */
+function buildPayload(status){
+  const score = S.answers.filter(x => x && x.ok).length;
+  return {
+    fio: S.meta.fio, klass: S.meta.klass, variant: S.meta.variant,
+    score, max: TOTAL, attempt: S.attemptNo, status,
+    violations: S.violations,
+    duration: Math.round((Date.now() - S.startedAt)/1000),
+    device: navigator.userAgent
+  };
+}
+
+function finish(status, alreadySent = false){
+  if(S.finished) return;
+  S.finished = true; S.active = false;
+  stopTimer();
+  $('warn').classList.remove('on');
+
+  const score = S.answers.filter(x => x && x.ok).length;
+  if(!alreadySent) sendResults(buildPayload(status));
+
+  const bad = status.startsWith('Прерван');
+  $('resCard').classList.toggle('bad', bad);
+  $('resBadge').textContent = bad ? 'Тест прерван системой' : 'Тест завершён';
+  $('resScore').textContent = score;
+  $('resBar').innerHTML = Array.from({length:TOTAL}, (_,i)=>`<i class="${i<score?'ok':''}"></i>`).join('');
+  $('resVerdict').textContent =
+    score >= 9 ? 'Отличный результат! 🏆' :
+    score >= 7 ? 'Хороший результат' :
+    score >= 5 ? 'Удовлетворительно' : 'Нужно повторить тему';
+  $('resFio').textContent    = S.meta.fio;
+  $('resClass').textContent  = S.meta.klass;
+  $('resVar').textContent    = S.meta.variant;
+  $('resAtt').textContent    = String(S.attemptNo);
+  $('resStatus').textContent = status + (S.violations ? ` (нарушений: ${S.violations})` : '');
+  $('resNote').textContent   = canSend()
+    ? '✓ Результат отправлен в журнал учителя (Google Таблица)'
+    : '⚠ Отправка в Google Таблицу не настроена (не указан SCRIPT_URL)';
+  show('scr-res');
+}
+
+$('btnAgain').addEventListener('click', ()=>{
+  S.finished = false;
+  $('discAgree').checked = false;
+  $('btnStart').disabled = true;
+  updateAttInfo();
+  show('scr-reg');
+});
+
+/* ═══════════ ОТПРАВКА В GOOGLE SHEETS ═══════════ */
+const canSend = () => /^https:\/\/script\.google\.com\//.test(SCRIPT_URL);
+async function sendResults(payload){
+  if(!canSend()) return;
+  const body = JSON.stringify(payload);
+  try{
+    await fetch(SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body
+    });
+  }catch(e){
+    try{ navigator.sendBeacon(SCRIPT_URL, new Blob([body], {type:'text/plain;charset=utf-8'})); }catch(_){}
+  }
+}
+</script>
+</body>
+</html>
